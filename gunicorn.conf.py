@@ -17,8 +17,9 @@ timeout = 30
 keepalive = 2
 
 # Logging
-accesslog = "logs/access.log"
-errorlog = "logs/error.log"
+# Use stdout/stderr for Render.com (no file system access needed)
+accesslog = "-"  # stdout
+errorlog = "-"   # stderr
 loglevel = "info"
 access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
 
@@ -26,8 +27,8 @@ access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
 proc_name = "gassstro_api"
 
 # Server Mechanics
-daemon = False  # Set to True to run as daemon
-pidfile = "gunicorn.pid"
+daemon = False  # Must be False for Render.com
+# pidfile not needed on Render (managed by platform)
 umask = 0
 user = None
 group = None
