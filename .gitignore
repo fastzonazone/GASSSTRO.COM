@@ -1,8 +1,41 @@
+# Environment variables
 .env
 .env.local
+.env.production
+*.env
+
+# Database
 orders.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# System files
 .DS_Store
+Thumbs.db
+
+# Exports and generated files
 exports/
 *.stl
+temp/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
