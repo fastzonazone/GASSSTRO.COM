@@ -223,9 +223,8 @@ function setupForm() {
         formData.append('total_price', priceText);
 
         try {
-            // 1. Create Payment Session (saves file + creates Stripe session)
-            // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on macOS
-            const paymentResp = await fetch('http://127.0.0.1:5000/api/create-payment', {
+            // Production: Render backend
+            const paymentResp = await fetch('https://timbrobro-backend.onrender.com/api/create-payment', {
                 method: 'POST',
                 body: formData
             });
