@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GASsstro Admin Control Center</title>
+
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <style>
+        body {
+            background: var(--swiss-gray);
+        }
+
+        .admin-card {
+            background: var(--swiss-white);
+            border: 2px solid var(--swiss-black);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--swiss-black);
+            color: var(--swiss-white);
+            text-align: left;
+            padding: 16px;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--swiss-gray);
+            font-size: 14px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: 1px solid var(--swiss-black);
+        }
+
+        .status-pending {
+            background: #ffeeba;
+            color: var(--swiss-black);
+        }
+
+        .status-processing {
+            background: #cce5ff;
+            color: var(--swiss-black);
+        }
+
+        .status-done {
+            background: #d4edda;
+            color: var(--swiss-black);
+        }
+
+        .payment-paid {
+            background: #d4edda;
+            color: var(--swiss-black);
+        }
+
+        .payment-unpaid {
+            background: #f8d7da;
+            color: var(--swiss-black);
+        }
+
+        .download-btn {
+            color: var(--swiss-red);
+            text-decoration: none;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .download-btn:hover {
+            text-decoration: underline;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar input,
+        .filter-bar select {
+            padding: 10px;
+            border: 2px solid var(--swiss-black);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        .filter-bar input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .notification-badge {
+            background: var(--swiss-red);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+
+        .notes-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 8px;
+            border: 1px solid var(--swiss-black);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 13px;
+            resize: vertical;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 200px;
+            padding: 20px;
+        }
+
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border: 4px solid var(--swiss-black);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--swiss-black);
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--swiss-black);
+            color: white;
+            padding: 16px 24px;
+            border: 2px solid var(--swiss-red);
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Login Overlay -->
+    <div id="login-overlay" class="login-overlay" style="display: none;">
+        <div class="login-box">
+            <h2 class="type-h2" style="margin-bottom: 24px;">🔒 Admin Login</h2>
+            <input type="password" id="password-input" placeholder="Enter admin password" />
+            <button onclick="attemptLogin()" class="btn" style="width: 100%;">Login</button>
+            <div id="login-error" style="color: var(--swiss-red); margin-top: 12px; display: none;"></div>
+        </div>
+    </div>
+
+    <header class="header" style="position: relative;">
+        <div class="logo">GASsstro.Admin</div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <div class="type-small" id="connection-status" style="color: var(--swiss-black);">🟡 Connecting...</div>
+            <button onclick="logout()" class="btn" style="padding: 8px 16px; font-size: 12px;">Logout</button>
+        </div>
+    </header>
+
+    <main class="container" style="padding-top: 32px;">
+
+        <!-- Analytics Bar -->
+        <div class="grid-12">
+            <div class="col-span-3">
+                <div class="admin-card" style="padding: 24px;">
+                    <div class="type-small" style="color: var(--swiss-red);">Incasso Totale</div>
+                    <div class="type-h2" id="stat-revenue">€0.00</div>
+                </div>
+            </div>
+            <div class="col-span-3">
+                <div class="admin-card" style="padding: 24px;">
+                    <div class="type-small" style="color: var(--swiss-red);">Ordini Totali</div>
+                    <div class="type-h2" id="stat-total">0</div>
+                </div>
+            </div>
+            <div class="col-span-3">
+                <div class="admin-card" style="padding: 24px;">
+                    <div class="type-small" style="color: var(--swiss-red);">Ordini Oggi</div>
+                    <div class="type-h2" id="stat-today">0</div>
+                </div>
+            </div>
+            <div class="col-span-3">
+                <div class="admin-card" style="padding: 24px;">
+                    <div class="type-small" style="color: var(--swiss-red);">Timbri Totali</div>
+                    <div class="type-h2" id="stat-stamps">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="grid-12">
+            <div class="col-span-6">
+                <div class="admin-card">
+                    <div style="padding: 16px; background: var(--swiss-black); color: white;">
+                        <h3 class="type-small" style="margin: 0;">REVENUE ULTIMI 7 GIORNI</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-span-6">
+                <div class="admin-card">
+                    <div style="padding: 16px; background: var(--swiss-black); color: white;">
+                        <h3 class="type-small" style="margin: 0;">ORDINI PER STATO</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h1 class="type-h2">
+                Lista Ordini
+                <span id="new-orders-badge" class="notification-badge" style="display: none;">0</span>
+            </h1>
+            <div style="display: flex; gap: 12px;">
+                <button onclick="exportCSV()" class="btn" style="padding: 10px 20px; font-size: 14px;">📊 Export
+                    CSV</button>
+                <button onclick="fetchOrders()" class="btn" style="padding: 10px 20px; font-size: 14px;">🔄
+                    Aggiorna</button>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <input type="text" id="search-input" placeholder="🔍 Cerca per nome, email, ID..." onkeyup="applyFilters()">
+            <select id="status-filter" onchange="applyFilters()">
+                <option value="">Tutti gli stati</option>
+                <option value="Pending">Pending</option>
+                <option value="Processing">Processing</option>
+                <option value="Done">Done</option>
+            </select>
+            <select id="payment-filter" onchange="applyFilters()">
+                <option value="">Tutti i pagamenti</option>
+                <option value="Paid">Paid</option>
+                <option value="Unpaid">Unpaid</option>
+            </select>
+            <input type="date" id="date-from" onchange="applyFilters()">
+            <input type="date" id="date-to" onchange="applyFilters()">
+        </div>
+
+        <div class="admin-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Anteprima</th>
+                        <th>Cliente</th>
+                        <th>File</th>
+                        <th>Qta / €</th>
+                        <th>Stato</th>
+                        <th>Pagamento</th>
+                        <th>Data</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-table">
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px;">Caricamento ordini...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+    <script>
+        // Configuration
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://127.0.0.1:5000/api'
+            : 'https://your-app.onrender.com/api'; // Update with your Render URL
+
+        let token = localStorage.getItem('admin_token');
+        let allOrders = [];
+        let previousCount = -1;
+        let lastCheckTime = new Date().toISOString();
+
+        // Charts
+        let revenueChart, statusChart;
+
+        // Audio
+        const dingSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+
+        // Initialize
+        window.onload = function () {
+            if (!token) {
+                showLoginOverlay();
+            } else {
+                initApp();
+            }
+        };
+
+        function showLoginOverlay() {
+            document.getElementById('login-overlay').style.display = 'flex';
+            document.getElementById('password-input').focus();
+            document.getElementById('password-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') attemptLogin();
+            });
+        }
+
+        async function attemptLogin() {
+            const password = document.getElementById('password-input').value;
+
+            try {
+                const res = await fetch(`${API_URL}/admin/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    token = data.token;
+                    localStorage.setItem('admin_token', token);
+                    document.getElementById('login-overlay').style.display = 'none';
+                    initApp();
+                } else {
+                    document.getElementById('login-error').textContent = '❌ ' + (data.error || 'Invalid password');
+                    document.getElementById('login-error').style.display = 'block';
+                }
+            } catch (e) {
+                document.getElementById('login-error').textContent = '❌ Connection error';
+                document.getElementById('login-error').style.display = 'block';
+            }
+        }
+
+        function logout() {
+            if (confirm('Vuoi uscire?')) {
+                localStorage.removeItem('admin_token');
+                location.reload();
+            }
+        }
+
+        function initApp() {
+            initCharts();
+            fetchOrders();
+            fetchStats();
+            setInterval(fetchOrders, 30000); // Poll every 30s
+            setInterval(checkNewOrders, 30000); // Check for new orders
+        }
+
+        function initCharts() {
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            revenueChart = new Chart(revenueCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Revenue (€)',
+                        data: [],
+                        backgroundColor: '#FF0000',
+                        borderColor: '#000',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Status Chart
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            statusChart = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['#ffeeba', '#cce5ff', '#d4edda'],
+                        borderColor: '#000',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        async function fetchStats() {
+            try {
+                const res = await fetch(`${API_URL}/admin/stats`, {
+                    headers: { 'X-Admin-Token': token }
+                });
+
+                if (!res.ok) throw new Error('Failed');
+
+                const stats = await res.json();
+
+                // Update stats cards
+                document.getElementById('stat-revenue').textContent = `€${stats.total_revenue.toFixed(2)}`;
+                document.getElementById('stat-total').textContent = stats.total_orders;
+                document.getElementById('stat-today').textContent = stats.today_orders;
+
+                // Update charts
+                if (stats.recent_activity && stats.recent_activity.length > 0) {
+                    revenueChart.data.labels = stats.recent_activity.map(d => d.date).reverse();
+                    revenueChart.data.datasets[0].data = stats.recent_activity.map(d => d.revenue || 0).reverse();
+                    revenueChart.update();
+                }
+
+                if (stats.orders_by_status) {
+                    statusChart.data.labels = Object.keys(stats.orders_by_status);
+                    statusChart.data.datasets[0].data = Object.values(stats.orders_by_status);
+                    statusChart.update();
+                }
+
+            } catch (e) {
+                console.error('Stats error:', e);
+            }
+        }
+
+        async function fetchOrders() {
+            try {
+                const res = await fetch(`${API_URL}/orders`, {
+                    headers: { 'X-Admin-Token': token }
+                });
+
+                if (res.status === 401) {
+                    logout();
+                    return;
+                }
+
+                if (!res.ok) throw new Error('Failed');
+
+                allOrders = await res.json();
+                applyFilters();
+                updateStatsFromOrders(allOrders);
+
+                // Audio notification
+                if (previousCount !== -1 && allOrders.length > previousCount) {
+                    playDing();
+                    showToast('🔔 Nuovo ordine ricevuto!');
+                }
+                previousCount = allOrders.length;
+
+                document.getElementById('connection-status').textContent = '🟢 Connected';
+                document.getElementById('connection-status').style.color = 'green';
+            } catch (e) {
+                console.error(e);
+                document.getElementById('connection-status').textContent = '🔴 Offline';
+                document.getElementById('connection-status').style.color = 'red';
+            }
+        }
+
+        async function checkNewOrders() {
+            try {
+                const res = await fetch(`${API_URL}/orders/new-count?since=${lastCheckTime}`, {
+                    headers: { 'X-Admin-Token': token }
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.new_orders > 0) {
+                        const badge = document.getElementById('new-orders-badge');
+                        badge.textContent = data.new_orders;
+                        badge.style.display = 'inline-block';
+                    }
+                }
+
+                lastCheckTime = new Date().toISOString();
+            } catch (e) {
+                console.error('New orders check error:', e);
+            }
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const statusFilter = document.getElementById('status-filter').value;
+            const paymentFilter = document.getElementById('payment-filter').value;
+            const dateFrom = document.getElementById('date-from').value;
+            const dateTo = document.getElementById('date-to').value;
+
+            let filtered = allOrders.filter(order => {
+                // Search
+                if (searchTerm && !(
+                    order.name.toLowerCase().includes(searchTerm) ||
+                    order.email.toLowerCase().includes(searchTerm) ||
+                    order.id.toString().includes(searchTerm)
+                )) return false;
+
+                // Status
+                if (statusFilter && order.status !== statusFilter) return false;
+
+                // Payment
+                if (paymentFilter && order.payment_status !== paymentFilter) return false;
+
+                // Date range
+                const orderDate = new Date(order.created_at).toISOString().split('T')[0];
+                if (dateFrom && orderDate < dateFrom) return false;
+                if (dateTo && orderDate > dateTo) return false;
+
+                return true;
+            });
+
+            renderTable(filtered);
+
+            // Reset new orders badge when viewing
+            document.getElementById('new-orders-badge').style.display = 'none';
+        }
+
+        function updateStatsFromOrders(orders) {
+            const stamps = orders.reduce((sum, o) => sum + (o.quantity || 0), 0);
+            document.getElementById('stat-stamps').textContent = stamps.toLocaleString();
+        }
+
+        function renderTable(orders) {
+            const tbody = document.getElementById('orders-table');
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 40px;" class="type-small">Nessun ordine trovato.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = orders.map(order => {
+                const previewPath = order.original_filepath || order.filepath;
+                const isImage = previewPath.match(/\.(jpg|jpeg|png)$/i);
+                const thumbUrl = isImage ? `${API_URL}/download?path=${previewPath}&token=${token}` : '';
+                const isDone = order.status === 'Done';
+
+                return `
+                <tr style="${isDone ? 'opacity: 0.5;' : ''}">
+                    <td style="font-family: monospace;">#${order.id}</td>
+                    <td>
+                        ${isImage ?
+                        `<img src="${thumbUrl}" style="width: 48px; height: 48px; object-fit: cover; border: 1px solid #000;" onclick="showImageModal('${thumbUrl}')">` :
+                        `<div style="width: 48px; height: 48px; background: #eee; border: 1px solid #000; display:flex; align-items:center; justify-content:center;">📦</div>`
+                    }
+                    </td>
+                    <td>
+                        <div style="font-weight: 700;">${order.name}</div>
+                        <div class="type-small" style="font-weight: 400;">${order.email}</div>
+                    </td>
+                    <td>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <a href="${API_URL}/download?path=${order.filepath}&token=${token}" class="download-btn" style="color:var(--swiss-red);">⬇ STL (3D)</a>
+                            ${order.original_filepath ?
+                        `<a href="${API_URL}/download?path=${order.original_filepath}&token=${token}" class="download-btn" style="color:#666; font-size:11px;">⬇ IMG (Orig)</a>`
+                        : ''}
+                        </div>
+                    </td>
+                    <td>
+                        <div>${order.quantity} pz</div>
+                        <div class="type-small">€${order.total_price}</div>
+                    </td>
+                    <td>
+                        <select onchange="updateStatus(${order.id}, this.value)" class="status-badge ${order.status === 'Done' ? 'status-done' : order.status === 'Processing' ? 'status-processing' : 'status-pending'}">
+                            <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="Processing" ${order.status === 'Processing' ? 'selected' : ''}>Processing</option>
+                            <option value="Done" ${order.status === 'Done' ? 'selected' : ''}>Done</option>
+                        </select>
+                    </td>
+                    <td>
+                        <span class="status-badge ${order.payment_status === 'Paid' ? 'payment-paid' : 'payment-unpaid'}">${order.payment_status || 'Unpaid'}</span>
+                    </td>
+                    <td class="type-small">${new Date(order.created_at).toLocaleDateString()}</td>
+                    <td>
+                        <div style="display: flex; gap: 6px;">
+                            <button onclick="showNotesModal(${order.id}, '${(order.notes || '').replace(/'/g, "\\'")}' )" style="cursor:pointer; border:1px solid #000; background:white; padding: 0 8px; height: 32px;" title="Note">📝</button>
+                            <button onclick="sendToPrinter(${order.id})" style="cursor:pointer; border:1px solid #000; background:white; padding: 0 8px; height: 32px;" title="Invia a BambuLab">🖨</button>
+                        </div>
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        async function updateStatus(id, newStatus) {
+            try {
+                await fetch(`${API_URL}/orders/${id}/status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Token': token
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                fetchOrders();
+                fetchStats();
+                showToast('✅ Stato aggiornato');
+            } catch (e) {
+                showToast('❌ Errore aggiornamento stato');
+            }
+        }
+
+        async function sendToPrinter(id) {
+            if (!confirm("Vuoi inviare questo file alla stampante?")) return;
+
+            try {
+                const res = await fetch(`${API_URL}/printer/upload/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Token': token
+                    }
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    showToast("✅ " + data.message);
+                } else {
+                    showToast("❌ Errore: " + data.error);
+                }
+            } catch (e) {
+                showToast("❌ Errore di connessione");
+            }
+        }
+
+        function showNotesModal(orderId, currentNotes) {
+            const notes = prompt("Note interne per ordine #" + orderId, currentNotes || '');
+            if (notes !== null) {
+                saveNotes(orderId, notes);
+            }
+        }
+
+        async function saveNotes(orderId, notes) {
+            try {
+                await fetch(`${API_URL}/orders/${orderId}/notes`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Token': token
+                    },
+                    body: JSON.stringify({ notes })
+                });
+                fetchOrders();
+                showToast('✅ Note salvate');
+            } catch (e) {
+                showToast('❌ Errore salvataggio note');
+            }
+        }
+
+        async function exportCSV() {
+            try {
+                const res = await fetch(`${API_URL}/orders/export`, {
+                    headers: { 'X-Admin-Token': token }
+                });
+
+                if (!res.ok) throw new Error('Export failed');
+
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `orders_${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+
+                showToast('✅ Export completato');
+            } catch (e) {
+                showToast('❌ Errore export');
+            }
+        }
+
+        function playDing() {
+            dingSound.play().catch(e => console.log("Audio needed user interaction first"));
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        function showImageModal(url) {
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:10000;';
+            modal.innerHTML = `<img src="${url}" style="max-width:90%;max-height:90%;border:4px solid white;">`;
+            modal.onclick = () => modal.remove();
+            document.body.appendChild(modal);
+        }
+    </script>
+</body>
+
+</html>

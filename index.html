@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GASsstro.com - Il Biglietto da Visita che si Mangia</title>
+    <meta name="description"
+        content="Sistemi di personalizzazione dolciaria per il settore B2B. Design svizzero, precisione italiana.">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="header">
+        <a href="#" class="logo">gassstro.com</a>
+        <nav>
+            <a href="#process" class="nav-link">Processo</a>
+            <a href="#configurator" class="nav-link">Configuratore</a>
+            <a href="#contatti" class="nav-link">Contatti</a>
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- Hero Section -->
+        <section class="section">
+            <div class="container">
+                <div class="grid-12">
+                    <div class="col-span-8">
+                        <h1 class="type-hero">Il Biglietto<br>Da Visita<br>Si Mangia.</h1>
+                    </div>
+                    <div class="col-span-4" style="display: flex; align-items: flex-end;">
+                        <p class="type-body">
+                            Basta gadget che finiscono nel cestino.
+                            Associa il tuo brand a un momento di puro piacere.
+                            Un'esperienza sensoriale che i tuoi clienti non dimenticheranno.
+                            <br><br>
+                            <a href="#configurator" class="btn">Inizia l'Esperienza</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product/Benefits Section -->
+        <section class="section">
+            <div class="container">
+                <div class="grid-12">
+                    <div class="col-span-4">
+                        <h2 class="type-h2">Un Gadget<br>Che Funziona</h2>
+                    </div>
+                    <div class="col-span-8">
+                        <p class="type-body" style="margin-bottom: 40px;">
+                            In un mondo saturato dal digitale, il gusto è l'unico canale ancora libero.
+                            Un'esperienza sensoriale che lascia il segno.
+                        </p>
+                        <div class="grid-12" style="padding: 0; gap: 40px;">
+                            <div class="col-span-6">
+                                <img src="images/cookie_texture.png" alt="Texture Premium Frolla"
+                                    style="width: 100%; height: auto; border: 2px solid var(--swiss-black);">
+                                <h3 class="type-small" style="margin-top: 15px;">Chiude i Contratti</h3>
+                                <p class="type-body" style="font-size: 16px; margin-top: 10px;">
+                                    Burro francese e Vaniglia Bourbon. La qualità del dolce riflette la qualità del tuo
+                                    servizio.
+                                </p>
+                            </div>
+                            <div class="col-span-6">
+                                <img src="images/logo_detail.png" alt="Dettaglio Logo Stampato"
+                                    style="width: 100%; height: auto; border: 2px solid var(--swiss-black);">
+                                <h3 class="type-small" style="margin-top: 15px;">Rispetta la tua Brand Identity</h3>
+                                <p class="type-body" style="font-size: 16px; margin-top: 10px;">
+                                    Dal monitor alla frolla, senza perdere un dettaglio. Nitido come una stampa, buono
+                                    come fatto in casa.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Configurator Section -->
+        <section id="configurator" class="section">
+            <div class="container">
+                <div class="grid-12">
+                    <div class="col-span-4">
+                        <h2 class="type-h2">Commissiona<br>La Produzione</h2>
+                        <p class="type-body" style="margin-top: 20px;">
+                            Carica il tuo marchio. Scegli la tiratura.
+                            Al resto pensiamo noi.
+                        </p>
+                    </div>
+
+                    <div class="col-span-8">
+                        <form id="order-form">
+                            <input type="hidden" name="_subject" value="Nuovo Ordine GASsstro B2B">
+
+                            <!-- Upload -->
+                            <!-- The Workbench: Upload Area -->
+                            <div class="workbench-container" id="workbench">
+                                <label class="form-label">01. Il tuo Marchio (Vettoriale)</label>
+
+                                <!-- Drop Zone State: Idle -->
+                                <div class="upload-zone" id="drop-zone">
+                                    <div class="upload-content">
+                                        <div class="icon-plus">＋</div>
+                                        <div class="type-h2">Trascina Asset Vettoriale</div>
+                                        <div class="type-small" style="margin-top: 15px; opacity: 0.6;">(SVG, AI, PDF,
+                                            High-Res PNG)</div>
+                                        <input type="file" id="logo-upload"
+                                            accept="image/png, image/jpeg, image/svg+xml, application/pdf" hidden>
+                                    </div>
+
+                                    <!-- Scanning Overlay (Hidden initially) -->
+                                    <div class="scanning-overlay" id="scanning-overlay" style="display: none;">
+                                        <div class="scan-line"></div>
+                                        <div class="scan-data">
+                                            <div class="type-small scan-text">Analisi Geometria... <span
+                                                    id="scan-percent">0%</span></div>
+                                            <div class="scan-grid"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- File Status (Post-Scan) -->
+                                <div id="file-status" class="file-status-panel" style="display: none;">
+                                    <div class="status-row">
+                                        <span class="type-small">File:</span>
+                                        <span class="type-code" id="file-name-display">logo.svg</span>
+                                    </div>
+                                    <div class="status-row">
+                                        <span class="type-small">Complessità:</span>
+                                        <span class="type-code" id="complexity-score">Calcolo...</span>
+                                    </div>
+                                    <div class="status-row">
+                                        <span class="type-small">Stato:</span>
+                                        <span class="type-code" style="color: var(--swiss-red);">APPROVATO PER
+                                            PRODUZIONE</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Details -->
+                            <div class="grid-12" style="margin-bottom: 30px;">
+                                <div class="col-span-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Ragione Sociale</label>
+                                        <input type="text" name="name" class="form-input" required
+                                            placeholder="Es. Studio Rossi">
+                                    </div>
+                                </div>
+                                <div class="col-span-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Email Aziendale</label>
+                                        <input type="email" name="email" class="form-input" required
+                                            placeholder="info@studiorossi.com">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pricing Calculator (Hidden initially) -->
+                            <div id="pricing-section" style="display: none; margin-bottom: 40px;">
+                                <label class="form-label">02. Quantitativo & Pricing</label>
+
+                                <div class="pricing-container">
+                                    <div class="pricing-row pricing-header">
+                                        <div class="type-small">Piano</div>
+                                        <div class="type-small">Range</div>
+                                        <div class="type-small" style="text-align: right;">Prezzo Unit.</div>
+                                    </div>
+                                    <div class="pricing-row" id="tier-small">
+                                        <div class="type-h2" style="font-size: 20px;">Small</div>
+                                        <div class="type-body">12-40</div>
+                                        <div class="type-h2" style="font-size: 20px; text-align: right;">€4.00</div>
+                                    </div>
+                                    <div class="pricing-row" id="tier-medium">
+                                        <div class="type-h2" style="font-size: 20px;">Medium</div>
+                                        <div class="type-body">41-99</div>
+                                        <div class="type-h2" style="font-size: 20px; text-align: right;">€3.70</div>
+                                    </div>
+                                    <div class="pricing-row" id="tier-corporate">
+                                        <div class="type-h2" style="font-size: 20px;">Corporate</div>
+                                        <div class="type-body">100+</div>
+                                        <div class="type-h2" style="font-size: 20px; text-align: right;">€3.40</div>
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: 30px; border: 2px solid var(--swiss-black); padding: 30px;">
+                                    <label class="form-label">Seleziona Quantità</label>
+                                    <div style="display: flex; align-items: center; gap: 20px;">
+                                        <input type="range" id="quantity-slider" min="12" max="500" step="1" value="12"
+                                            style="flex: 1;">
+                                        <input type="number" id="quantity-display" name="quantity" class="form-input"
+                                            value="12" style="width: 100px; text-align: center;">
+                                    </div>
+                                    <div style="margin-top: 20px; text-align: right;">
+                                        <div class="type-small">Totale Stimato</div>
+                                        <div class="type-h1" id="total-price" style="color: var(--swiss-red);">€48
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Note Tecniche</label>
+                                <textarea name="message" rows="4"></textarea>
+                            </div>
+
+                            <div class="form-group"
+                                style="margin-top: 30px; display: flex; align-items: flex-start; gap: 10px;">
+                                <input type="checkbox" id="privacy-check" name="privacy_accepted" required
+                                    style="margin-top: 5px;">
+                                <label for="privacy-check" class="type-small" style="line-height: 1.4;">
+                                    Ho letto e accetto la <a href="privacy.html"
+                                        style="text-decoration: underline;">Privacy Policy</a>.
+                                    Acconsento al trattamento dei dati per la gestione dell'ordine.
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn" style="width: 100%; margin-top: 20px;">Invia
+                                Richiesta</button>
+                            <div id="form-status" class="type-small" style="text-align: center; margin-top: 20px;">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Process Section -->
+        <section id="process" class="section">
+            <div class="container">
+                <div class="grid-12">
+                    <div class="col-span-4">
+                        <h2 class="type-h2">Come<br>Funziona</h2>
+                    </div>
+                    <div class="col-span-8">
+                        <div class="feature-item">
+                            <span class="step-number">01</span>
+                            <h3 class="type-h2">Configurazione</h3>
+                            <p class="type-body">Carica il tuo logo e scegli la quantità. Il nostro software analizza la
+                                geometria in tempo reale.</p>
+                        </div>
+                        <div class="feature-item">
+                            <span class="step-number">02</span>
+                            <h3 class="type-h2">Produzione</h3>
+                            <p class="type-body">Creiamo uno stampo su misura e imprimiamo la tua identità su una frolla
+                                premium.</p>
+                        </div>
+                        <div class="feature-item">
+                            <span class="step-number">03</span>
+                            <h3 class="type-h2">Spedizione</h3>
+                            <p class="type-body">Ricevi il tuo ordine in imballi sicuri, pronti per essere offerti ai
+                                tuoi clienti.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer id="contatti" class="footer-section">
+        <div class="container">
+            <div class="grid-12" style="margin-bottom: 60px;">
+                <div class="col-span-3">
+                    <div class="footer-logo-text">gassstro.com</div>
+                    <p class="type-small" style="margin-top: 20px; opacity: 0.7;">Il biglietto da visita che si mangia.
+                    </p>
+                </div>
+                <div class="col-span-3">
+                    <h4 class="type-small" style="margin-bottom: 15px;">Servizi</h4>
+                    <ul class="footer-links">
+                        <li><a href="#configurator">Configuratore</a></li>
+                        <li><a href="#process">Come Funziona</a></li>
+                        <li><a href="#">Galleria</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-3">
+                    <h4 class="type-small" style="margin-bottom: 15px;">Legale</h4>
+                    <ul class="footer-links">
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="#">Termini e Condizioni</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">Diritto di Recesso</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-3">
+                    <h4 class="type-small" style="margin-bottom: 15px;">Contatti</h4>
+                    <ul class="footer-links">
+                        <li><a href="mailto:info@gassstro.com">info@gassstro.com</a></li>
+                        <li><a href="tel:+390000000000">+39 000 000 0000</a></li>
+                        <li>Lun-Ven: 9:00-18:00</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="grid-12">
+                    <div class="col-span-6">
+                        <span class="type-small">© 2024 GASsstro System. Tutti i diritti riservati.</span>
+                    </div>
+                    <div class="col-span-6" style="text-align: right;">
+                        <span class="type-small">Design: Swiss Minimalism</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- Cookie Banner -->
+    <div id="cookie-banner" class="cookie-banner" style="display: none;">
+        <div class="container">
+            <div class="grid-12" style="align-items: center;">
+                <div class="col-span-8">
+                    <p class="type-small" style="color: white; margin: 0;">
+                        Questo sito utilizza cookie tecnici per garantire la migliore esperienza.
+                        Rispettiamo la tua privacy al 100%.
+                        <a href="privacy.html" style="color: white; text-decoration: underline;">Leggi Policy</a>.
+                    </p>
+                </div>
+                <div class="col-span-4" style="text-align: right;">
+                    <button id="accept-cookies" class="btn"
+                        style="background: white; color: var(--swiss-black); padding: 10px 20px; font-size: 12px;">ACCETTA
+                        E CONTINUA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>

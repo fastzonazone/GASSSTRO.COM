@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordine Confermato - GASsstro.com</title>
+    <meta name="description" content="Il tuo ordine è stato confermato con successo.">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .success-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .success-card {
+            max-width: 800px;
+            border: 2px solid var(--swiss-black);
+            padding: 60px;
+            text-align: center;
+            background: var(--swiss-white);
+        }
+
+        .success-icon {
+            font-size: 120px;
+            color: var(--swiss-red);
+            margin-bottom: 30px;
+            animation: checkmark 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes checkmark {
+            0% {
+                transform: scale(0) rotate(-45deg);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .order-details {
+            margin: 40px 0;
+            padding: 30px;
+            border: 2px solid var(--swiss-black);
+            background: var(--swiss-gray);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--swiss-black);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .next-steps {
+            text-align: left;
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 2px solid var(--swiss-black);
+        }
+
+        .step-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--swiss-red);
+            min-width: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="header">
+        <a href="index.html" class="logo">gassstro.com</a>
+        <nav>
+            <a href="index.html#process" class="nav-link">Processo</a>
+            <a href="index.html#configurator" class="nav-link">Configuratore</a>
+            <a href="index.html#contatti" class="nav-link">Contatti</a>
+        </nav>
+    </header>
+
+    <div class="success-container">
+        <div class="success-card">
+            <div class="success-icon">✓</div>
+
+            <h1 class="type-h1" style="margin-bottom: 20px;">ORDINE CONFERMATO</h1>
+            <p class="type-body" style="font-size: 20px; margin-bottom: 40px;">
+                Pagamento ricevuto con successo.<br>
+                Il tuo ordine è in produzione.
+            </p>
+
+            <div class="order-details">
+                <div class="detail-row">
+                    <span class="type-small">NUMERO ORDINE</span>
+                    <span class="type-code" id="order-number">Caricamento...</span>
+                </div>
+                <div class="detail-row">
+                    <span class="type-small">EMAIL CONFERMA</span>
+                    <span class="type-code" id="order-email">Verifica la tua casella</span>
+                </div>
+                <div class="detail-row">
+                    <span class="type-small">STATO</span>
+                    <span class="type-code" style="color: var(--swiss-red);">IN PRODUZIONE</span>
+                </div>
+            </div>
+
+            <div class="next-steps">
+                <h2 class="type-h2" style="margin-bottom: 30px;">Prossimi Passi</h2>
+
+                <div class="step-item">
+                    <span class="step-number">01</span>
+                    <div>
+                        <h3 class="type-small" style="margin-bottom: 10px;">CONFERMA EMAIL</h3>
+                        <p class="type-body">Riceverai una email di conferma con tutti i dettagli dell'ordine e il
+                            tracking number.</p>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <span class="step-number">02</span>
+                    <div>
+                        <h3 class="type-small" style="margin-bottom: 10px;">PRODUZIONE</h3>
+                        <p class="type-body">Creeremo uno stampo personalizzato per il tuo logo e produrremo i biscotti
+                            premium.</p>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <span class="step-number">03</span>
+                    <div>
+                        <h3 class="type-small" style="margin-bottom: 10px;">SPEDIZIONE</h3>
+                        <p class="type-body">Tempo stimato: 5-7 giorni lavorativi. Riceverai un tracking number per
+                            seguire la spedizione.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 50px; display: flex; gap: 20px; justify-content: center;">
+                <a href="index.html" class="btn">Torna alla Home</a>
+                <a href="mailto:info@gassstro.com" class="btn"
+                    style="background: transparent; color: var(--swiss-black); border: 2px solid var(--swiss-black);">Contattaci</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get session_id from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+
+        if (sessionId) {
+            // Display session ID as order number (first 16 chars)
+            document.getElementById('order-number').textContent = sessionId.substring(0, 16).toUpperCase();
+        } else {
+            document.getElementById('order-number').textContent = 'N/A';
+        }
+    </script>
+
+</body>
+
+</html>
