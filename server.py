@@ -120,8 +120,8 @@ def get_db_connection():
         conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
         return conn
     else:
-        conn = get_db_connection()
-        
+        conn = sqlite3.connect(DB_FILE)
+        conn.row_factory = sqlite3.Row
         return conn
 
 def init_db():
