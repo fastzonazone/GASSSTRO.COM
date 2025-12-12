@@ -46,7 +46,16 @@ SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
 
 # 2. CORS Restriction
 ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "*").split(",")
-CORS(app, resources={r"/api/*": {"origins": ALLOWED_ORIGINS}})
+# Strip whitespace from origins
+ALLOWED_ORIGINS = [origin.strip() for origin in ALLOWED_ORIGINS]
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ALLOWED_ORIGINS,
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "X-Admin-Token"],
+        "supports_credentials": True
+    }
+})
 
 # 3. Rate Limiting (Prevent DDoS/Spam)
 limiter = Limiter(
